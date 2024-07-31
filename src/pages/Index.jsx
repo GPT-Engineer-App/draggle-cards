@@ -44,6 +44,11 @@ const Index = () => {
     exploit: 0,
     exfiltrate: 0,
   });
+  const [logs, setLogs] = useState([]);
+
+  const addLog = useCallback((message) => {
+    setLogs((prevLogs) => [...prevLogs, `[${new Date().toISOString()}] ${message}`]);
+  }, []);
 
   const triggerConfetti = useCallback(() => {
     setShowConfetti(true);
@@ -141,16 +146,10 @@ const Index = () => {
     }, {});
   }, [columns, completedTasks]);
 
-  const [logs, setLogs] = useState([]);
-
   useEffect(() => {
     const initialLog = `System initialized.\nLoading Hacker's Kanban...`;
-    setLogs([initialLog]);
-  }, []);
-
-  const addLog = useCallback((message) => {
-    setLogs((prevLogs) => [...prevLogs, `[${new Date().toISOString()}] ${message}`]);
-  }, []);
+    addLog(initialLog);
+  }, [addLog]);
 
   useEffect(() => {
     const interval = setInterval(() => {
