@@ -66,7 +66,7 @@ const Index = () => {
       const updatedCards = column.cards.filter(card => card.id !== taskId);
       const updatedColumn = { ...column, cards: updatedCards };
       triggerConfetti();
-      addLog(`Task completed in ${column.title}: ${task.content}`);
+      addLog(`Task completed in ${column.title}: "${task.content}"`);
       return { ...prevColumns, [columnId]: updatedColumn };
     });
   }, [triggerConfetti, addLog]);
@@ -88,6 +88,7 @@ const Index = () => {
           cards: newCards,
         },
       });
+      addLog(`Task "${reorderedItem.content}" reordered within ${column.title}`);
     } else {
       const sourceColumn = columns[source.droppableId];
       const destColumn = columns[destination.droppableId];
@@ -107,6 +108,7 @@ const Index = () => {
           cards: destCards,
         },
       });
+      addLog(`Task "${movedItem.content}" moved from ${sourceColumn.title} to ${destColumn.title}`);
     }
   };
 
@@ -132,7 +134,7 @@ const Index = () => {
         [columnId]: ''
       });
 
-      addLog(`New task added to ${columns[columnId].title}: ${newTaskContent}`);
+      addLog(`New task added to ${columns[columnId].title}: "${newTaskContent}"`);
     }
   };
 
