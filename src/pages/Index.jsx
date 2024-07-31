@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { Terminal } from 'lucide-react';
+import { Terminal, Plus } from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const initialColumns = {
   'recon': {
@@ -29,6 +31,11 @@ const initialColumns = {
 
 const Index = () => {
   const [columns, setColumns] = useState(initialColumns);
+  const [newTasks, setNewTasks] = useState({
+    recon: '',
+    exploit: '',
+    exfiltrate: '',
+  });
 
   const onDragEnd = (result) => {
     const { source, destination } = result;
@@ -69,6 +76,29 @@ const Index = () => {
     }
   };
 
+  const handleAddTask = (columnId) => {
+    if (newTasks[columnId].trim() !== '') {
+      const newTaskId = `task${Date.now()}`;
+      const updatedColumn = {
+        ...columns[columnId],
+        cards: [
+          ...columns[columnId].cards,
+          { id: newTaskId, content: newTasks[columnId].trim() }
+        ]
+      };
+
+      setColumns({
+        ...columns,
+        [columnId]: updatedColumn
+      });
+
+      setNewTasks({
+        ...newTasks,
+        [columnId]: ''
+      });
+    }
+  };
+
   return (
     <div className="p-8 bg-black text-green-400 min-h-screen">
       <h1 className="text-3xl font-bold mb-8 flex items-center">
@@ -80,6 +110,18 @@ const Index = () => {
           {Object.values(columns).map((column) => (
             <div key={column.id} className="bg-gray-900 p-4 rounded-lg w-80 border border-green-400">
               <h2 className="text-lg font-semibold mb-4 text-green-400">{column.title}</h2>
+              <div className="flex mb-4">
+                <Input
+                  type="text"
+                  placeholder="New task"
+                  value={newTasks[column.id]}
+                  onChange={(e) => setNewTasks({ ...newTasks, [column.id]: e.target.value })}
+                  className="mr-2 bg-gray-800 text-green-400 border-green-400"
+                />
+                <Button onClick={() => handleAddTask(column.id)} className="bg-green-600 hover:bg-green-700">
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
               <Droppable droppableId={column.id}>
                 {(provided) => (
                   <div
