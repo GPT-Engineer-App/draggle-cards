@@ -168,15 +168,25 @@ const Index = () => {
     return () => clearInterval(interval);
   }, [addLog]);
 
-  const TerminalLogs = () => (
-    <ScrollArea className="h-64 w-full border border-green-400 rounded-lg p-4 bg-black text-green-400 font-mono text-sm">
-      {logs.map((log, index) => (
-        <div key={index} className="whitespace-pre-wrap">
-          {log}
-        </div>
-      ))}
-    </ScrollArea>
-  );
+  const TerminalLogs = () => {
+    const scrollAreaRef = React.useRef(null);
+
+    React.useEffect(() => {
+      if (scrollAreaRef.current) {
+        scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+      }
+    }, [logs]);
+
+    return (
+      <ScrollArea className="h-64 w-full border border-green-400 rounded-lg p-4 bg-black text-green-400 font-mono text-sm" ref={scrollAreaRef}>
+        {logs.map((log, index) => (
+          <div key={index} className="whitespace-pre-wrap">
+            {log}
+          </div>
+        ))}
+      </ScrollArea>
+    );
+  };
 
   return (
     <div className="p-8 bg-black text-green-400 min-h-screen">
