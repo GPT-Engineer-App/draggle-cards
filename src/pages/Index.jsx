@@ -1,27 +1,28 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { Terminal } from 'lucide-react';
 
 const initialColumns = {
-  'todo': {
-    id: 'todo',
-    title: 'To Do',
+  'recon': {
+    id: 'recon',
+    title: 'Reconnaissance',
     cards: [
-      { id: 'task1', content: 'Create mockup' },
-      { id: 'task2', content: 'Design components' },
+      { id: 'task1', content: 'Scan network vulnerabilities' },
+      { id: 'task2', content: 'Identify target systems' },
     ],
   },
-  'inprogress': {
-    id: 'inprogress',
-    title: 'In Progress',
+  'exploit': {
+    id: 'exploit',
+    title: 'Exploitation',
     cards: [
-      { id: 'task3', content: 'Implement drag and drop' },
+      { id: 'task3', content: 'Develop custom exploit' },
     ],
   },
-  'done': {
-    id: 'done',
-    title: 'Done',
+  'exfiltrate': {
+    id: 'exfiltrate',
+    title: 'Exfiltration',
     cards: [
-      { id: 'task4', content: 'Set up project' },
+      { id: 'task4', content: 'Extract sensitive data' },
     ],
   },
 };
@@ -69,13 +70,16 @@ const Index = () => {
   };
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-8">Trello Clone</h1>
+    <div className="p-8 bg-black text-green-400 min-h-screen">
+      <h1 className="text-3xl font-bold mb-8 flex items-center">
+        <Terminal className="mr-2" />
+        Hacker's Kanban
+      </h1>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="flex space-x-4">
           {Object.values(columns).map((column) => (
-            <div key={column.id} className="bg-gray-100 p-4 rounded-lg w-80">
-              <h2 className="text-lg font-semibold mb-4">{column.title}</h2>
+            <div key={column.id} className="bg-gray-900 p-4 rounded-lg w-80 border border-green-400">
+              <h2 className="text-lg font-semibold mb-4 text-green-400">{column.title}</h2>
               <Droppable droppableId={column.id}>
                 {(provided) => (
                   <div
@@ -90,7 +94,7 @@ const Index = () => {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className={`bg-white p-3 rounded shadow mb-2 ${
+                            className={`bg-gray-800 p-3 rounded shadow mb-2 border border-green-400 ${
                               snapshot.isDragging ? 'opacity-50' : ''
                             }`}
                           >
