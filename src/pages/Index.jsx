@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 const initialColumns = {
   'todo': {
@@ -85,12 +85,14 @@ const Index = () => {
                   >
                     {column.cards.map((card, index) => (
                       <Draggable key={card.id} draggableId={card.id} index={index}>
-                        {(provided) => (
+                        {(provided, snapshot) => (
                           <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className="bg-white p-3 rounded shadow mb-2"
+                            className={`bg-white p-3 rounded shadow mb-2 ${
+                              snapshot.isDragging ? 'opacity-50' : ''
+                            }`}
                           >
                             {card.content}
                           </div>
