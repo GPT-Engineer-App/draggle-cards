@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { Terminal, Plus, Check } from 'lucide-react';
+import { Terminal, Plus, Check, BarChart } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ReactConfetti from 'react-confetti';
@@ -38,6 +38,11 @@ const Index = () => {
     exfiltrate: '',
   });
   const [showConfetti, setShowConfetti] = useState(false);
+  const [completedTasks, setCompletedTasks] = useState({
+    recon: 0,
+    exploit: 0,
+    exfiltrate: 0,
+  });
 
   const triggerConfetti = useCallback(() => {
     setShowConfetti(true);
@@ -45,6 +50,10 @@ const Index = () => {
   }, []);
 
   const markTaskAsDone = useCallback((columnId, taskId) => {
+    setCompletedTasks(prev => ({
+      ...prev,
+      [columnId]: prev[columnId] + 1
+    }));
     setColumns(prevColumns => {
       const column = prevColumns[columnId];
       const updatedCards = column.cards.filter(card => card.id !== taskId);
@@ -116,6 +125,16 @@ const Index = () => {
     }
   };
 
+  const columnStats = useMemo(() => {
+    return Object.entries(columns).reduce((acc, [columnId, column]) => {
+      acc[columnId] = {
+        total: column.cards.length,
+        completed: completedTasks[columnId]
+      };
+      return acc;
+    }, {});
+  }, [columns, completedTasks]);
+
   return (
     <div className="p-8 bg-black text-green-400 min-h-screen">
       {showConfetti && <ReactConfetti colors={['#10B981', '#34D399', '#6EE7B7']} />}
@@ -127,7 +146,13 @@ const Index = () => {
         <div className="flex space-x-4">
           {Object.values(columns).map((column) => (
             <div key={column.id} className="bg-gray-900 p-4 rounded-lg w-80 border border-green-400">
-              <h2 className="text-lg font-semibold mb-4 text-green-400">{column.title}</h2>
+              <h2 className="text-lg font-semibold mb-2 text-green-400">{column.title}</h2>
+              <div className="flex items-center mb-4 text-sm">
+                <BarChart className="mr-2 h-4 w-4" />
+                <span>
+                  Tasks: {columnStats[column.id].total} | Completed: {columnStats[column.id].completed}
+                </span>
+              </div>
               <div className="flex mb-4">
                 <Input
                   type="text"
