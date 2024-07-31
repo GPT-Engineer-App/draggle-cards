@@ -1,9 +1,10 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Terminal, Plus, Check, BarChart } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ReactConfetti from 'react-confetti';
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const initialColumns = {
   'recon': {
@@ -56,12 +57,14 @@ const Index = () => {
     }));
     setColumns(prevColumns => {
       const column = prevColumns[columnId];
+      const task = column.cards.find(card => card.id === taskId);
       const updatedCards = column.cards.filter(card => card.id !== taskId);
       const updatedColumn = { ...column, cards: updatedCards };
       triggerConfetti();
+      addLog(`Task completed in ${column.title}: ${task.content}`);
       return { ...prevColumns, [columnId]: updatedColumn };
     });
-  }, [triggerConfetti]);
+  }, [triggerConfetti, addLog]);
 
   const onDragEnd = (result) => {
     const { source, destination } = result;
@@ -105,11 +108,12 @@ const Index = () => {
   const handleAddTask = (columnId) => {
     if (newTasks[columnId].trim() !== '') {
       const newTaskId = `task${Date.now()}`;
+      const newTaskContent = newTasks[columnId].trim();
       const updatedColumn = {
         ...columns[columnId],
         cards: [
           ...columns[columnId].cards,
-          { id: newTaskId, content: newTasks[columnId].trim() }
+          { id: newTaskId, content: newTaskContent }
         ]
       };
 
@@ -122,6 +126,8 @@ const Index = () => {
         ...newTasks,
         [columnId]: ''
       });
+
+      addLog(`New task added to ${columns[columnId].title}: ${newTaskContent}`);
     }
   };
 
@@ -134,6 +140,42 @@ const Index = () => {
       return acc;
     }, {});
   }, [columns, completedTasks]);
+
+  const [logs, setLogs] = useState([]);
+
+  useEffect(() => {
+    const initialLog = `System initialized.\nLoading Hacker's Kanban...`;
+    setLogs([initialLog]);
+  }, []);
+
+  const addLog = useCallback((message) => {
+    setLogs((prevLogs) => [...prevLogs, `[${new Date().toISOString()}] ${message}`]);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const messages = [
+        "Scanning network...",
+        "Probing firewall...",
+        "Analyzing vulnerabilities...",
+        "Updating task status...",
+        "Monitoring system resources...",
+      ];
+      addLog(messages[Math.floor(Math.random() * messages.length)]);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [addLog]);
+
+  const TerminalLogs = () => (
+    <ScrollArea className="h-64 w-full border border-green-400 rounded-lg p-4 bg-black text-green-400 font-mono text-sm">
+      {logs.map((log, index) => (
+        <div key={index} className="whitespace-pre-wrap">
+          {log}
+        </div>
+      ))}
+    </ScrollArea>
+  );
 
   return (
     <div className="p-8 bg-black text-green-400 min-h-screen">
@@ -202,6 +244,13 @@ const Index = () => {
           ))}
         </div>
       </DragDropContext>
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold mb-4 flex items-center">
+          <Terminal className="mr-2" />
+          System Logs
+        </h2>
+        <TerminalLogs />
+      </div>
     </div>
   );
 };
