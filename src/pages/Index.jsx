@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { Terminal, Plus } from 'lucide-react';
+import { Terminal, Plus, Check } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import ReactConfetti from 'react-confetti';
 
 const initialColumns = {
   'recon': {
@@ -36,6 +37,22 @@ const Index = () => {
     exploit: '',
     exfiltrate: '',
   });
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  const triggerConfetti = useCallback(() => {
+    setShowConfetti(true);
+    setTimeout(() => setShowConfetti(false), 5000); // Stop confetti after 5 seconds
+  }, []);
+
+  const markTaskAsDone = useCallback((columnId, taskId) => {
+    setColumns(prevColumns => {
+      const column = prevColumns[columnId];
+      const updatedCards = column.cards.filter(card => card.id !== taskId);
+      const updatedColumn = { ...column, cards: updatedCards };
+      triggerConfetti();
+      return { ...prevColumns, [columnId]: updatedColumn };
+    });
+  }, [triggerConfetti]);
 
   const onDragEnd = (result) => {
     const { source, destination } = result;
@@ -101,6 +118,7 @@ const Index = () => {
 
   return (
     <div className="p-8 bg-black text-green-400 min-h-screen">
+      {showConfetti && <ReactConfetti colors={['#10B981', '#34D399', '#6EE7B7']} />}
       <h1 className="text-3xl font-bold mb-8 flex items-center">
         <Terminal className="mr-2" />
         Hacker's Kanban
@@ -138,9 +156,15 @@ const Index = () => {
                             {...provided.dragHandleProps}
                             className={`bg-gray-800 p-3 rounded shadow mb-2 border border-green-400 ${
                               snapshot.isDragging ? 'opacity-50' : ''
-                            }`}
+                            } flex justify-between items-center`}
                           >
-                            {card.content}
+                            <span>{card.content}</span>
+                            <Button
+                              onClick={() => markTaskAsDone(column.id, card.id)}
+                              className="bg-green-600 hover:bg-green-700 p-1 rounded-full"
+                            >
+                              <Check className="h-4 w-4" />
+                            </Button>
                           </div>
                         )}
                       </Draggable>
